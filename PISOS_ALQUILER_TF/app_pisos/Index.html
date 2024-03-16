@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+
+</head>
+<body style="background-color: #6c757d; color: white;">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-6 offset-md-3">
+                <div class="card mt-5 shadow">
+                    <div class="card-body">
+                        <h4 class="text-center text-dark">Red Neuronal Pisos de Alquiler en El Salvador</h4>
+                    </div>
+                </div>
+
+                <div class="card mt-2 shadow" style="background-color: #343a40; color: white;">
+                    <div class="card-body">
+                        <label>M^2</label>
+                        <input type="number" class="form-control mb-3" id="m2">
+
+                        <label>Nº de habitaciones</label>
+                        <input type="number" class="form-control mb-3" id="hab">
+
+                        <label>Nº de planta</label>
+                        <input type="number" class="form-control mb-3" id="planta">
+
+                        <label>Ascensor</label>
+                        <select id="ascensor" class="form-control mb-3">
+                            <option disabled selected>Elige una opción...</option>
+                            <option value=0>No</option>
+                            <option value=1>Si</option>
+                        </select>
+
+                        <label>Exterior</label>
+                        <select id="ext" class="form-control mb-3">
+                            <option disabled selected>Elige una opción...</option>
+                            <option value=0>No</option>
+                            <option value=1>Si</option>
+                        </select>
+
+                        <label>Estado</label>
+                        <select id="est" class="form-control mb-3">
+                            <option disabled selected>Elige una opción...</option>
+                            <option value=0>No rehabilitado</option>
+                            <option value=1>Rehabilitado</option>
+                            <option value=2>Nuevo</option>
+                        </select>
+
+                        <label>Céntrico</label>
+                        <select id="cent" class="form-control mb-3">
+                            <option disabled selected>Elige una opción...</option>
+                            <option value=0>No</option>
+                            <option value=1>Si</option>
+                        </select>
+
+                        <div class="d-flex">
+                            <button class="btn btn-primary" type="button" id="btn">Calcular precio</button>
+                            <h5 id="resultado" class="mx-5 mt-2"></h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
+
+    <script>
+
+        var modelo = null;
+        //Cargamos el modelo entrenado
+        (async() =>{
+            console.log("Cargando el modelo...");
+            modelo = await tf.loadLayersModel("model.json");
+            console.log("Modelo cargado!");
+        })();
+
+        const btn = document.getElementById("btn");
+        
+        btn.onclick = () => {
+ var m2 = parseInt(document.getElementById('m2').value);
+ var hab = parseInt(document.getElementById('hab').value);
+ var planta = parseInt(document.getElementById('planta').value);
+ var ascensor = parseInt(document.getElementById('ascensor').value);
+ var ext = parseInt(document.getElementById('ext').value);
+ var est = parseInt(document.getElementById('est').value);
+ var cent = parseInt(document.getElementById('cent').value);
+
+if (modelo !== null) {
+ var tensor = tf.tensor2d([[0, m2, hab, planta, ascensor, ext, est, cent]]);
+ var prediccion = modelo.predict(tensor).dataSync();
+ if (!isNaN(prediccion[0])) {
+ var prediccionNumero = parseFloat(prediccion[0].toFixed(2)); // Redondear y convertir a número de coma flotante
+ document.getElementById("resultado").innerHTML = "Precio: " + prediccion + "€/mes";
+ } else {
+ document.getElementById("resultado").innerHTML = "Error: el modelo generó un resultado inválido.";
+ }
+ } else {
+ document.getElementById("resultado").innerHTML = "Intenta de nuevo en un rato...";
+ }
+}
+
+    </script>
+    
+</body>
+</html>
